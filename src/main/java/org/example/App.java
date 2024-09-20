@@ -11,19 +11,19 @@ public class App {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         char choice;
-        String menuvg = """
+        String menu = """
                 Elpriser
-                 ========
+                ========
                 1. Inmatning
                 2. Min, Max och Medel
                 3. Sortera
                 4. Bästa Laddningstid (4h)
-                5. Visualisering
                 e. Avsluta
+                "]
                 """;
 
         do {
-            System.out.print(menuvg);
+            System.out.print(menu);
             choice = scanner.next().charAt(0);
             menuChoice(choice, scanner);
         } while (choice != 'e' && choice != 'E');}
@@ -42,14 +42,12 @@ public class App {
             case '4':
                 bestChargingTime();
                 break;
-            case '5':
-                visualize();
             case 'e':
             case 'E':
-                System.out.println("Programmet avslutas");
+                System.out.print("Programmet avslutas\n");
                 break;
             default:
-                System.out.println("Invalid choice");
+                System.out.print("Invalid choice\n");
         }
         }
 
@@ -65,7 +63,7 @@ public class App {
                             validInput = true;
                     }
                     else {
-                        System.out.println("Ogiltig inmatning ange ören i heltal");
+                        System.out.print("Ogiltig inmatning ange ören i heltal\n");
                         scanner.next();
                     }
                 }
@@ -89,16 +87,50 @@ public class App {
                 sum += prices[i];}
 
             double ave = (double) sum / HoursInDay;
-            System.out.printf("Lägsta pris: %02d-%02d, %d öre/kWh %n" +
-                            "Högsta pris: %02d-%02d, %d öre/kWh %n" +
-                            "Medelpris: %.2f öre/kWh%n",
-                        minHour, minHour + 1, min, maxHour, maxHour + 1, max, ave); }
+            String result = String.format("""
+                              "Lägsta pris: %02d-%02d, %d öre/kWh
+                            Högsta pris: %02d-%02d, %d öre/kWh
+                            Medelpris: %.2f öre/kWh
+                            "
+                            """,
+                        minHour, minHour + 1, min, maxHour, maxHour + 1, max, ave);
+            System.out.printf(result);
+    }
+
 
         private static void sort () {
-            Arrays.sort(prices);
-            System.out.println("Priser är sorterade i stigande ordning");
+            int[] sorted = new int[HoursInDay];
+
             for (int i = 0; i < HoursInDay; i++) {
-                    System.out.printf("%02d-%02d: %d öre%n", i, i + 1, prices[i]);
+                sorted[i] = i;
+            }
+            for (int i = 0; i < HoursInDay; i++) {
+                for (int j = i + 1; j < HoursInDay; j++) {
+                    if (prices[sorted[i]] < prices[sorted[j]] ||
+                        (prices[sorted[i]] == prices[sorted[j]] && sorted[i] > sorted[j])) {
+                            int temp = sorted[i];
+                            sorted[i] = sorted[j];
+                            sorted[j] = temp;
+                    }
+                }
+            }
+
+            for (int i : sorted) {
+                int nextHour = (i + 1) % 24;
+                String response;
+
+                // Specialregel för att visa "23-24" istället för "23-00"
+                if (i == 23) {
+                    response = String.format("""
+            %02d-%02d %d öre
+            """, i, HoursInDay, prices[i]);
+                }
+                else {
+                    response = String.format("""
+                            %02d-%02d %d öre
+                            """, i, nextHour, prices[i]);
+                }
+                System.out.print(response);
             }
         }
 
@@ -116,32 +148,16 @@ public class App {
                     bestStartHour = i;
                 }
             }
-            System.out.printf("Påbörja laddning kl %02d%n Medelpris 4h: %.2f öre/kWh%n",
-                    bestStartHour, minSum / 4);
+            String response = String.format("""
+                       "Påbörja laddning klockan %02d
+                    Medelpris 4h: %.1f öre/kWh
+                    "
+                    """, bestStartHour, minSum / 4);
+            System.out.printf(response);
+
         }
 
-        private static void visualize() {
-        int maxPrice = Arrays.stream(prices).max().getAsInt();
-        int minPrice = Arrays.stream(prices).min().getAsInt();
-        int scaleFactor = 10;
 
-        for (int level = maxPrice; level >= minPrice; level -= scaleFactor) {
-            System.out.printf("%3d|", level);
-            for (int price : prices) {
-                if (price >= level) {
-                    System.out.print("x  ");
-                } else {
-                    System.out.print("   ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.print("   ");
-        for (int i = 0; i < HoursInDay; i++) {
-            System.out.printf("%02d ", i);
-        }
-            System.out.println();
-    }
 }
 
 
