@@ -2,6 +2,7 @@ package org.example;
 
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class App {
@@ -10,6 +11,9 @@ public class App {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        float f = 2.3f;
+        String.format("%.2f", f).replace('.', ',');
+        System.out.printf(Locale.of("sv", "SE"), "%.2f", f);
         char choice;
         String menu = """
                 Elpriser
