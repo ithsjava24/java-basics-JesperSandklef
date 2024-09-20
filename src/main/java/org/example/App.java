@@ -11,9 +11,6 @@ public class App {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        float f = 2.3f;
-        String.format("%.2f", f).replace('.', ',');
-        System.out.printf(Locale.of("sv", "SE"), "%.2f", f);
         char choice;
         String menu = """
                 Elpriser
@@ -30,6 +27,7 @@ public class App {
             System.out.print(menu);
             choice = scanner.next().charAt(0);
             menuChoice(choice, scanner);
+            Locale.setDefault(Locale.of("sv", "SE"));
         } while (choice != 'e' && choice != 'E');}
 
         private static void menuChoice(char choice, Scanner scanner) {
